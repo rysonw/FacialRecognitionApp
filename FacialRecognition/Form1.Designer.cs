@@ -66,6 +66,7 @@
             this.detectButton.TabIndex = 2;
             this.detectButton.Text = "Detect Faces";
             this.detectButton.UseVisualStyleBackColor = true;
+            this.detectButton.Click += new System.EventHandler(this.detectButton_Click);
             // 
             // textPersonName
             // 
