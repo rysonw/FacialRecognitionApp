@@ -11,6 +11,8 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.Face;
 using Emgu.CV.CvEnum;
+using System.IO;
+using System.Threading;
 
 namespace FacialRecognition
 {
@@ -19,10 +21,17 @@ namespace FacialRecognition
 
         //Variables
         private Capture vidCapture = null; //Declare a new Capture Object
-        private Image<Bgr, Byte> currentFrame = null;
+        private Image<Bgr, Byte> currentFrame = null; //Bgr is a color scheme, OpenCV uses BGR as their default. Here we are creating an image and defining that it will be in Bgr and represented as bytes
         private bool faceDetectionEnabled = false;
+        //private string cascadeFileLocation = ""
 
-        CascadeClassifier faceCascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml");
+        Image<Bgr, Byte> faceResult = null;
+        List<Image<Gray, Byte>> TrainedFaces = new List<Image<Gray, byte>>();
+        List<int> PersonsLabes = new List<int>();
+        bool enableSaveImage = false;
+   
+
+        CascadeClassifier faceCascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle
         Mat frame = new Mat();
 
 
@@ -48,7 +57,7 @@ namespace FacialRecognition
             //Step 2: Facial Recognition while capturing video
             if (faceDetectionEnabled)
             {
-                //Convert gr Image to a Gray Image
+                //Convert Bgr Image to a Gray Image
                 Mat grayImage = new Mat();
                 CvInvoke.CvtColor(currentFrame, grayImage, ColorConversion.Bgr2Gray);
                 CvInvoke.EqualizeHist(grayImage, grayImage); //Enhancing Image for easier recognition
@@ -58,10 +67,40 @@ namespace FacialRecognition
                 //Detect Faces
                 if (faces.Length > 0)
                 {
+                    int faceId = 0;
                     foreach(var face in faces)
                     {
                         //Draw Rectangle around the faces
-                        CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3);
+                        CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3); //Change frames here
+
+                        //Step 3: Add Person
+                        Image<Bgr, Byte> resultImage = currentFrame.Convert<Bgr, Byte>();
+                        resultImage.ROI = face;
+                        samplePictureBox.SizeMode = PictureBoxSizeMode.StretchImage; //Resizing capture to fit in mini capture box on the left
+                        samplePictureBox.Image = resultImage.Bitmap;
+
+                        if (enableSaveImage)
+                        {
+                            string path = Directory.GetCurrentDirectory() + @"\Train_Images"; //Change direvtory for saving images here 
+
+                            if (!Directory.Exists(path)) //We create this directory if it does not exist 
+                            {
+                                Directory.CreateDirectory(path);
+                            }
+
+                            Task.Factory.StartNew(() => //Tasks are basically threads
+                            {
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    //Resizing the image and then saving it the directory above
+                                    resultImage.Resize(200, 200, Inter.Cubic).Save(path + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg");
+                                    Thread.Sleep(1000);
+                                }
+
+                            });
+                            enableSaveImage = false;
+                        }
+
 
                     }                
                 }
@@ -76,6 +115,21 @@ namespace FacialRecognition
             //Step 2: Facial Recognition while capturing video
             faceDetectionEnabled = true;
 
+
+        }
+
+        private void addPersonButton_Click(object sender, EventArgs e)
+        {
+            saveButton.Enabled = true;
+            addPersonButton.Enabled = true;
+            enableSaveImage = true;
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            saveButton.Enabled = false;
+            addPersonButton.Enabled = true;
+            enableSaveImage = false;
 
         }
     }

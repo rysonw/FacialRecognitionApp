@@ -36,6 +36,7 @@
             this.trainButton = new System.Windows.Forms.Button();
             this.recognizeButton = new System.Windows.Forms.Button();
             this.samplePictureBox = new System.Windows.Forms.PictureBox();
+            this.saveButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picCapture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.samplePictureBox)).BeginInit();
             this.SuspendLayout();
@@ -60,7 +61,7 @@
             // 
             // detectButton
             // 
-            this.detectButton.Location = new System.Drawing.Point(659, 60);
+            this.detectButton.Location = new System.Drawing.Point(659, 49);
             this.detectButton.Name = "detectButton";
             this.detectButton.Size = new System.Drawing.Size(127, 27);
             this.detectButton.TabIndex = 2;
@@ -70,23 +71,24 @@
             // 
             // textPersonName
             // 
-            this.textPersonName.Location = new System.Drawing.Point(661, 217);
+            this.textPersonName.Location = new System.Drawing.Point(659, 234);
             this.textPersonName.Name = "textPersonName";
             this.textPersonName.Size = new System.Drawing.Size(127, 20);
             this.textPersonName.TabIndex = 3;
             // 
             // addPersonButton
             // 
-            this.addPersonButton.Location = new System.Drawing.Point(661, 244);
+            this.addPersonButton.Location = new System.Drawing.Point(659, 82);
             this.addPersonButton.Name = "addPersonButton";
             this.addPersonButton.Size = new System.Drawing.Size(127, 23);
             this.addPersonButton.TabIndex = 4;
             this.addPersonButton.Text = "Add Person";
             this.addPersonButton.UseVisualStyleBackColor = true;
+            this.addPersonButton.Click += new System.EventHandler(this.addPersonButton_Click);
             // 
             // trainButton
             // 
-            this.trainButton.Location = new System.Drawing.Point(661, 273);
+            this.trainButton.Location = new System.Drawing.Point(659, 290);
             this.trainButton.Name = "trainButton";
             this.trainButton.Size = new System.Drawing.Size(127, 24);
             this.trainButton.TabIndex = 5;
@@ -95,7 +97,7 @@
             // 
             // recognizeButton
             // 
-            this.recognizeButton.Location = new System.Drawing.Point(661, 304);
+            this.recognizeButton.Location = new System.Drawing.Point(659, 320);
             this.recognizeButton.Name = "recognizeButton";
             this.recognizeButton.Size = new System.Drawing.Size(127, 23);
             this.recognizeButton.TabIndex = 6;
@@ -104,17 +106,28 @@
             // 
             // samplePictureBox
             // 
-            this.samplePictureBox.Location = new System.Drawing.Point(659, 94);
+            this.samplePictureBox.Location = new System.Drawing.Point(659, 111);
             this.samplePictureBox.Name = "samplePictureBox";
             this.samplePictureBox.Size = new System.Drawing.Size(127, 117);
             this.samplePictureBox.TabIndex = 7;
             this.samplePictureBox.TabStop = false;
+            // 
+            // saveButton
+            // 
+            this.saveButton.Location = new System.Drawing.Point(659, 261);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(127, 23);
+            this.saveButton.TabIndex = 8;
+            this.saveButton.Text = "Save";
+            this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.saveButton);
             this.Controls.Add(this.samplePictureBox);
             this.Controls.Add(this.recognizeButton);
             this.Controls.Add(this.trainButton);
@@ -142,6 +155,7 @@
         private System.Windows.Forms.Button trainButton;
         private System.Windows.Forms.Button recognizeButton;
         private System.Windows.Forms.PictureBox samplePictureBox;
+        private System.Windows.Forms.Button saveButton;
     }
 }
 
