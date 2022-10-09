@@ -37,6 +37,8 @@
             this.recognizeButton = new System.Windows.Forms.Button();
             this.samplePictureBox = new System.Windows.Forms.PictureBox();
             this.saveButton = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.picCapture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.samplePictureBox)).BeginInit();
             this.SuspendLayout();
@@ -88,7 +90,7 @@
             // 
             // trainButton
             // 
-            this.trainButton.Location = new System.Drawing.Point(659, 290);
+            this.trainButton.Location = new System.Drawing.Point(659, 372);
             this.trainButton.Name = "trainButton";
             this.trainButton.Size = new System.Drawing.Size(127, 24);
             this.trainButton.TabIndex = 5;
@@ -97,7 +99,7 @@
             // 
             // recognizeButton
             // 
-            this.recognizeButton.Location = new System.Drawing.Point(659, 320);
+            this.recognizeButton.Location = new System.Drawing.Point(659, 402);
             this.recognizeButton.Name = "recognizeButton";
             this.recognizeButton.Size = new System.Drawing.Size(127, 23);
             this.recognizeButton.TabIndex = 6;
@@ -114,7 +116,7 @@
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(659, 261);
+            this.saveButton.Location = new System.Drawing.Point(659, 343);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(127, 23);
             this.saveButton.TabIndex = 8;
@@ -122,11 +124,27 @@
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(659, 260);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(127, 20);
+            this.textBox1.TabIndex = 9;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(659, 286);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(127, 20);
+            this.textBox2.TabIndex = 10;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.samplePictureBox);
             this.Controls.Add(this.recognizeButton);
@@ -156,6 +174,8 @@
         private System.Windows.Forms.Button recognizeButton;
         private System.Windows.Forms.PictureBox samplePictureBox;
         private System.Windows.Forms.Button saveButton;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox2;
     }
 }
 

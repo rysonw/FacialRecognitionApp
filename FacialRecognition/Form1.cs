@@ -13,13 +13,16 @@ using Emgu.CV.Face;
 using Emgu.CV.CvEnum;
 using System.IO;
 using System.Threading;
+using System.Drawing.Text;
+using System.Diagnostics;
 
 namespace FacialRecognition
 {
     public partial class Form1 : Form
     {
 
-        //Variables
+        #region Global Variables
+
         private Capture vidCapture = null; //Declare a new Capture Object
         private Image<Bgr, Byte> currentFrame = null; //Bgr is a color scheme, OpenCV uses BGR as their default. Here we are creating an image and defining that it will be in Bgr and represented as bytes
         private bool faceDetectionEnabled = false;
@@ -28,11 +31,15 @@ namespace FacialRecognition
         Image<Bgr, Byte> faceResult = null;
         List<Image<Gray, Byte>> TrainedFaces = new List<Image<Gray, byte>>();
         List<int> PersonsLabes = new List<int>();
+        List<string> PersonsNames = new List<string>();
         bool enableSaveImage = false;
-   
+        bool isTrained = false;
 
         CascadeClassifier faceCascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle
         Mat frame = new Mat();
+        EigenFaceRecognizer recognizer;
+
+        #endregion
 
 
         public Form1()
@@ -67,11 +74,11 @@ namespace FacialRecognition
                 //Detect Faces
                 if (faces.Length > 0)
                 {
-                    int faceId = 0;
+                    //int faceId = 0;
                     foreach(var face in faces)
                     {
                         //Draw Rectangle around the faces
-                        CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3); //Change frames here
+                        // CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3);
 
                         //Step 3: Add Person
                         Image<Bgr, Byte> resultImage = currentFrame.Convert<Bgr, Byte>();
@@ -99,6 +106,36 @@ namespace FacialRecognition
 
                             });
                             enableSaveImage = false;
+
+
+                            if (addPersonButton.InvokeRequired) //Invokes make sure you are interacting with the right element in the correct thread
+                            {
+                                addPersonButton.Invoke(new ThreadStart(delegate
+                                {
+                                    addPersonButton.Enabled = true;
+                                }));
+                            }
+
+                            //Step 5: Recognize Known Faces
+                            if (isTrained)
+                            {
+                                Image<Gray, Byte> grayFaceResult = resultImage.Convert<Gray, Byte>().Resize(200, 200, Inter.Cubic);
+
+                                var result = recognizer.Predict(grayFaceResult);
+
+                                if (result.Label != -1 && result.Distance < 2000)
+                                {
+                                    CvInvoke.PutText(currentFrame, "???", new Point(face.X - 2, face.Y - 2), FontFace.HersheyTriplex, 1.0, new Bgr(Color.Red).MCvScalar);
+                                    CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3);
+                                }
+                                //If faces seen are not known
+                                else
+                                {
+                                    CvInvoke.PutText(currentFrame, "???", new Point(face.X - 2, face.Y - 2), FontFace.HersheyTriplex, 1.0, new Bgr(Color.Red).MCvScalar);
+                                    CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3);
+                                }
+                            }
+
                         }
 
 
@@ -114,8 +151,6 @@ namespace FacialRecognition
         {
             //Step 2: Facial Recognition while capturing video
             faceDetectionEnabled = true;
-
-
         }
 
         private void addPersonButton_Click(object sender, EventArgs e)
@@ -131,6 +166,47 @@ namespace FacialRecognition
             addPersonButton.Enabled = true;
             enableSaveImage = false;
 
+        }
+
+        private bool TrainImagesFromDirectory()
+        {
+            int imageCount = 0;
+            double threshold = -1;
+            TrainedFaces.Clear();
+            PersonsLabes.Clear();
+            PersonsNames.Clear();
+
+            try
+            {
+                string path = Directory.GetCurrentDirectory() + @"\Trained_Faces";
+                string[] files = Directory.GetFiles(path, "*.jpg", SearchOption.AllDirectories); //Creating array of all files
+
+                foreach (var file in files)
+                {
+                    Image<Gray, Byte> trainedImage = new Image<Gray, byte>(file);
+                    TrainedFaces.Add(trainedImage);
+                    PersonsLabes.Add(imageCount);
+                    string name = file.Split('\\').Last().Split('_')[0];
+                    PersonsNames.Add(name);
+                    imageCount++;
+                    Debug.WriteLine(imageCount + ". " + name);
+                    imageCount++;
+                }
+
+                EigenFaceRecognizer recognizer = new EigenFaceRecognizer(imageCount, threshold);
+                recognizer.Train(TrainedFaces.ToArray(), PersonsLabes.ToArray());
+
+                isTrained = true;
+                return true;
+
+            }
+
+            catch (Exception ex)
+            {
+                isTrained = false;
+                MessageBox.Show("Error in Train Images: " + ex.Message);
+                return false;
+            }
         }
     }
 }
