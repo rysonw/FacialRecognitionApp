@@ -47,7 +47,7 @@ namespace FacialRecognition
             InitializeComponent();
         }
 
-        private void captureButton_Click(object sender, EventArgs e)
+        private void CaptureButton_Click(object sender, EventArgs e)
         {
             vidCapture = new Capture();
             vidCapture.ImageGrabbed += ProcessFrame;
@@ -83,8 +83,8 @@ namespace FacialRecognition
                         //Step 3: Add Person
                         Image<Bgr, Byte> resultImage = currentFrame.Convert<Bgr, Byte>();
                         resultImage.ROI = face;
-                        samplePictureBox.SizeMode = PictureBoxSizeMode.StretchImage; //Resizing capture to fit in mini capture box on the left
-                        samplePictureBox.Image = resultImage.Bitmap;
+                        SamplePictureBox.SizeMode = PictureBoxSizeMode.StretchImage; //Resizing capture to fit in mini capture box on the left
+                        SamplePictureBox.Image = resultImage.Bitmap;
 
                         if (enableSaveImage)
                         {
@@ -108,11 +108,11 @@ namespace FacialRecognition
                             enableSaveImage = false;
 
 
-                            if (addPersonButton.InvokeRequired) //Invokes make sure you are interacting with the right element in the correct thread
+                            if (AddPersonButton.InvokeRequired) //Invokes make sure you are interacting with the right element in the correct thread
                             {
-                                addPersonButton.Invoke(new ThreadStart(delegate
+                                AddPersonButton.Invoke(new ThreadStart(delegate
                                 {
-                                    addPersonButton.Enabled = true;
+                                    AddPersonButton.Enabled = true;
                                 }));
                             }
 
@@ -147,31 +147,36 @@ namespace FacialRecognition
 
         }
 
-        private void detectButton_Click(object sender, EventArgs e)
+        private void DetectButton_Click(object sender, EventArgs e)
         {
             //Step 2: Facial Recognition while capturing video
             faceDetectionEnabled = true;
         }
 
-        private void addPersonButton_Click(object sender, EventArgs e)
+        private void AddPersonButton_Click(object sender, EventArgs e)
         {
-            saveButton.Enabled = true;
-            addPersonButton.Enabled = true;
+            SaveButton.Enabled = true;
+            AddPersonButton.Enabled = true;
             enableSaveImage = true;
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private void SaveButton_Click(object sender, EventArgs e)
         {
-            saveButton.Enabled = false;
-            addPersonButton.Enabled = true;
+            SaveButton.Enabled = false;
+            AddPersonButton.Enabled = true;
             enableSaveImage = false;
 
+        }
+
+        private void TrainButton_Click(object sender, EventArgs e)
+        {
+            TrainImagesFromDirectory();
         }
 
         private bool TrainImagesFromDirectory()
         {
             int imageCount = 0;
-            double threshold = -1;
+            double threshold = 2000;
             TrainedFaces.Clear();
             PersonsLabes.Clear();
             PersonsNames.Clear();
@@ -208,5 +213,6 @@ namespace FacialRecognition
                 return false;
             }
         }
+
     }
 }
