@@ -35,7 +35,7 @@ namespace FacialRecognition
         bool enableSaveImage = false;
         bool isTrained = false;
 
-        CascadeClassifier faceCascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle
+        CascadeClassifier faceCascadeClassifier = new CascadeClassifier("C:\\Users\\wongr\\OneDrive\\Desktop\\CS_Projects\\FaceRecog\\FacialRecognition\\haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle
         Mat frame = new Mat();
         EigenFaceRecognizer recognizer;
 
