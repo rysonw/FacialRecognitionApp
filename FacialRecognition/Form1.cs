@@ -15,6 +15,7 @@ using System.IO;
 using System.Threading;
 using System.Drawing.Text;
 using System.Diagnostics;
+using Google.Cloud.Vision.V1;
 
 namespace FacialRecognition
 {
@@ -34,6 +35,7 @@ namespace FacialRecognition
         List<string> PersonsNames = new List<string>();
         bool enableSaveImage = false;
         bool isTrained = false;
+        public string path = Directory.GetCurrentDirectory() + @"\Train_Images"; //Change direvtory for saving images here 
 
         CascadeClassifier faceCascadeClassifier = new CascadeClassifier("C:\\Users\\wongr\\OneDrive\\Desktop\\CS_Projects\\FaceRecog\\FacialRecognition\\haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle
         Mat frame = new Mat();
@@ -45,15 +47,18 @@ namespace FacialRecognition
         public Form1()
         {
             InitializeComponent();
-        }
-
-        private void CaptureButton_Click(object sender, EventArgs e)
-        {
             vidCapture = new Capture();
             vidCapture.ImageGrabbed += ProcessFrame;
             vidCapture.Start();
-                
         }
+
+        //private void CaptureButton_Click(object sender, EventArgs e)
+        //{
+        //    vidCapture = new Capture();
+        //    vidCapture.ImageGrabbed += ProcessFrame;
+        //    vidCapture.Start();
+                
+        //}
 
         private void ProcessFrame(object sender, EventArgs e) //Handles ProcessFrame which will be rendered into picture box
         {
@@ -74,10 +79,9 @@ namespace FacialRecognition
                 //Detect Faces
                 if (faces.Length > 0)
                 {
-                    //int faceId = 0;
                     foreach(var face in faces)
                     {
-                        //Draw Rectangle around the faces
+                        // Draw Rectangle around the faces
                         // CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3);
 
                         //Step 3: Add Person
@@ -88,23 +92,30 @@ namespace FacialRecognition
 
                         if (enableSaveImage)
                         {
-                            string path = Directory.GetCurrentDirectory() + @"\Train_Images"; //Change direvtory for saving images here 
 
                             if (!Directory.Exists(path)) //We create this directory if it does not exist 
                             {
                                 Directory.CreateDirectory(path);
                             }
+                            //Tasks are basically threads; Is this thread needed if we are only taking one picture?; Google Cloud API implementation starts here. Have it save image to directory then send to Google for classification
 
-                            Task.Factory.StartNew(() => //Tasks are basically threads
+                            //TODO: Should I wipe this directory before making the sending out the request?
+                            var client = ImageAnnotatorClient.Create();
+
+                            resultImage.Resize(200, 200, Inter.Cubic).Save(path + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy") + ".jpg");
+
+                            //Load recently saved image into memory
+                            var sentImage = Google.Cloud.Vision.V1.Image.FromFile(path + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy") + ".jpg");
+
+                            //Perform label detection on image file; here we are saving the JSON response
+                            var response = client.DetectLabels(sentImage);
+                              
+                            //For Testing; Printing out all JSON classifications
+                            foreach (var annotation in response)
                             {
-                                for (int i = 0; i < 10; i++)
-                                {
-                                    //Resizing the image and then saving it the directory above
-                                    resultImage.Resize(200, 200, Inter.Cubic).Save(path + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg");
-                                    Thread.Sleep(1000);
-                                }
-
-                            });
+                                Console.WriteLine($"{annotation.Description}");
+                            }
+                            
                             enableSaveImage = false;
 
 
@@ -116,6 +127,9 @@ namespace FacialRecognition
                                 }));
                             }
 
+                            //Step 1: Clear File Directory; Step 2: Take 10 file captures of face, Step 3: Send ONE image to Google for classification Step 4: Save the JSON results and display it in a graph. Step 5: TODO create a GUI to display most likely mood as well as results for all moods; Step 6: TODO Create a front end for entertainment results (????) 
+
+
                             //Step 5: Recognize Known Faces
                             if (isTrained)
                             {
@@ -125,10 +139,10 @@ namespace FacialRecognition
 
                                 if (result.Label != -1 && result.Distance < 2000)
                                 {
-                                    CvInvoke.PutText(currentFrame, "???", new Point(face.X - 2, face.Y - 2), FontFace.HersheyTriplex, 1.0, new Bgr(Color.Red).MCvScalar);
+                                    CvInvoke.PutText(currentFrame, textPersonName.Text, new Point(face.X - 2, face.Y - 2), FontFace.HersheyTriplex, 1.0, new Bgr(Color.Red).MCvScalar);
                                     CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3);
                                 }
-                                //If faces seen are not known
+                                //If faces seen are not known; TODO Not recognizing for some reason
                                 else
                                 {
                                     CvInvoke.PutText(currentFrame, "???", new Point(face.X - 2, face.Y - 2), FontFace.HersheyTriplex, 1.0, new Bgr(Color.Red).MCvScalar);
@@ -161,17 +175,18 @@ namespace FacialRecognition
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
-        {
+        { 
             SaveButton.Enabled = false;
             AddPersonButton.Enabled = true;
             enableSaveImage = false;
-
         }
 
         private void TrainButton_Click(object sender, EventArgs e)
         {
             TrainImagesFromDirectory();
         }
+
+
 
         private bool TrainImagesFromDirectory()
         {
@@ -215,4 +230,5 @@ namespace FacialRecognition
         }
 
     }
+    
 }
