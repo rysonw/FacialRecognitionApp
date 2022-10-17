@@ -37,7 +37,11 @@ namespace FacialRecognition
         List<string> PersonsNames = new List<string>();
         bool enableSaveImage = false;
         bool isTrained = false;
-        public string pathTrain = Directory.GetCurrentDirectory() + @"\Train_Images"; //Change direvtory for saving images here 
+        
+        public string pathTrain = Directory.GetCurrentDirectory() + @"\Train_Images"; //Change directory for saving images for training
+        public string pathToSend = Directory.GetCurrentDirectory() + @"\Send_Images"; //Directory for saving images to send to Google Cloud Vision
+        public string pathToFace;
+        DirectoryInfo dirToSend = new DirectoryInfo(Directory.GetCurrentDirectory() + @"\Send_Images");
 
         CascadeClassifier faceCascadeClassifier = new CascadeClassifier("C:\\Users\\wongr\\OneDrive\\Desktop\\CS_Projects\\FaceRecog\\FacialRecognition\\haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle; Static for now will add secret later
         Mat frame = new Mat();
@@ -108,6 +112,23 @@ namespace FacialRecognition
                                     Thread.Sleep(1000);
                                 }
                             });
+
+                            if (dirToSend.GetDirectories() == null) //Checking to see if pathSending Directory is empty
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                FileInfo[] files = dirToSend.GetFiles();
+                                foreach (FileInfo file in files)
+                                {
+                                    file.Delete();
+                                }
+                            }
+
+                            resultImage.Resize(200, 200, Inter.Cubic).Save(pathToSend + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg");
+                            pathToFace = pathToSend + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg";
+
                             ////TODO: Should I wipe this directory before making the sending out the request?
                             //var client = ImageAnnotatorClient.Create();
 
@@ -186,15 +207,18 @@ namespace FacialRecognition
             AddPersonButton.Enabled = true;
             enableSaveImage = false;
 
+            
+         
+
             var client = ImageAnnotatorClient.Create();
-            var image = Google.Cloud.Vision.V1.Image.FromFile("Sample Images\\happy.jfif"); //How to save image and send it to Google Cloud API; Create stats??
+            var image = Google.Cloud.Vision.V1.Image.FromFile(pathToFace); //How to save image and send it to Google Cloud API; Create stats??
             var response = client.DetectFaces(image).ToString(); //JSON response
 
             //System.Diagnostics.Debug.Write(response.ToString());
 
             dynamic dynJson = JsonConvert.DeserializeObject(response);
 
-            //Displayin JSON in respective fields
+            //Displaying JSON in respective fields
             confidenceOutput.Text = $"Detection Confidence: {(dynJson[0]["detectionConfidence"].ToDouble() * 100).ToString()}%";
             joyOutput.Text = $"Joy: {dynJson[0]["joyLikelihood"].ToString()}";
             sorrowOutput.Text = $"Sorrow: {dynJson[0]["sorrowLikelihood"].ToString()}";
