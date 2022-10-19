@@ -192,10 +192,11 @@ namespace FacialRecognition
 
         private void DetectButton_Click(object sender, EventArgs e)
         {
-            //Step 2: Facial Recognition while capturing video
+            //Step 2: Facial Recognition while capturing video; NEEDS TO BE CLICKED BEFORE ADD PERSON or ERROR
             faceDetectionEnabled = true;
         }
 
+        //Wrap in try catch block
         private void AddPersonButton_Click(object sender, EventArgs e)
         {
             SaveAndSendButton.Enabled = true;
@@ -207,9 +208,11 @@ namespace FacialRecognition
             var response = client.DetectFaces(image).ToString(); //JSON response
 
             //System.Diagnostics.Debug.Write(response.ToString());
-
+            Thread.Sleep(1000);
             dynamic dynJson = JsonConvert.DeserializeObject(response);
-            confidenceOutput.Text = $"{(dynJson[0]["detectionConfidence"].ToString())}%";
+            double confidence = (dynJson[0]["detectionConfidence"].T) * 100;
+
+            confidenceOutput.Text = $"{confidence.ToString()}%";
             joyOutput.Text = $"{dynJson[0]["joyLikelihood"].ToString()}";
             sorrowOutput.Text = $"{dynJson[0]["sorrowLikelihood"].ToString()}";
             angerOutput.Text = $"{dynJson[0]["angerLikelihood"].ToString()}";
