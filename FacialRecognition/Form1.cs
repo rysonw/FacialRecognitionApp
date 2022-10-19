@@ -210,7 +210,7 @@ namespace FacialRecognition
             //System.Diagnostics.Debug.Write(response.ToString());
             Thread.Sleep(1000);
             dynamic dynJson = JsonConvert.DeserializeObject(response);
-            double confidence = (dynJson[0]["detectionConfidence"].T) * 100;
+            double confidence = Convert.ToDouble(dynJson[0]["detectionConfidence"]) * 100;
 
             confidenceOutput.Text = $"{confidence.ToString()}%";
             joyOutput.Text = $"{dynJson[0]["joyLikelihood"].ToString()}";
