@@ -31,13 +31,13 @@ namespace FacialRecognition
         //private string cascadeFileLocation = ""
         public string currentPhotoPath = "";
 
-        Image<Bgr, Byte> faceResult = null;
+        //Image<Bgr, Byte> faceResult = null;
         List<Image<Gray, Byte>> TrainedFaces = new List<Image<Gray, byte>>();
         List<int> PersonsLabes = new List<int>();
         List<string> PersonsNames = new List<string>();
         bool enableSaveImage = false;
         bool isTrained = false;
-        
+
         public string pathTrain = Directory.GetCurrentDirectory() + @"\Train_Images"; //Change directory for saving images for training
         public string pathToSend = Directory.GetCurrentDirectory() + @"\Send_Images"; //Directory for saving images to send to Google Cloud Vision
         public string pathToFace;
@@ -46,6 +46,7 @@ namespace FacialRecognition
         CascadeClassifier faceCascadeClassifier = new CascadeClassifier("C:\\Users\\wongr\\OneDrive\\Desktop\\CS_Projects\\FaceRecog\\FacialRecognition\\haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle; Static for now will add secret later
         Mat frame = new Mat();
         EigenFaceRecognizer recognizer;
+        
 
         #endregion
 
@@ -103,6 +104,12 @@ namespace FacialRecognition
                             {
                                 Directory.CreateDirectory(pathTrain);
                             }
+
+                            if (!Directory.Exists(pathToSend)) //We create this directory if it does not exist 
+                            {
+                                Directory.CreateDirectory(pathToSend);
+                            }
+
                             ////Tasks are basically threads; Is this thread needed if we are only taking one picture?; Google Cloud API implementation starts here. Have it save image to directory then send to Google for classification
                             Task.Factory.StartNew(() => {
                                 for (int i = 0; i < 10; i++)
@@ -112,6 +119,8 @@ namespace FacialRecognition
                                     Thread.Sleep(1000);
                                 }
                             });
+
+
 
                             if (dirToSend.GetDirectories() == null) //Checking to see if pathSending Directory is empty
                             {
@@ -126,21 +135,12 @@ namespace FacialRecognition
                                 }
                             }
 
+                            enableSaveImage = false;
+
                             resultImage.Resize(200, 200, Inter.Cubic).Save(pathToSend + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg");
                             pathToFace = pathToSend + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg";
 
-                            ////TODO: Should I wipe this directory before making the sending out the request?
-                            //var client = ImageAnnotatorClient.Create();
-
-                            //resultImage.Resize(200, 200, Inter.Cubic).Save(path + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy") + ".jpg");
-
-                            ////Load recently saved image into memory
-                            //var sentImage = Google.Cloud.Vision.V1.Image.FromFile(path + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy") + ".jpg");
-
-                            ////Perform label detection on image file; here we are saving the JSON response
-                            //var response = client.DetectLabels(sentImage);
-
-                            enableSaveImage = false;
+                           
 
 
                             if (AddPersonButton.InvokeRequired) //Invokes make sure you are interacting with the right element in the correct thread
@@ -148,9 +148,11 @@ namespace FacialRecognition
                                 AddPersonButton.Invoke(new ThreadStart(delegate
                                 {
                                     AddPersonButton.Enabled = true;
+
                                 }));  
                             }
 
+                            
 
                             //Step 5: Recognize Known Faces
                             if (isTrained)
@@ -199,16 +201,6 @@ namespace FacialRecognition
             SaveAndSendButton.Enabled = true;
             AddPersonButton.Enabled = true;
             enableSaveImage = true;
-        }
-
-        private void SaveAndSendButton_Click(object sender, EventArgs e)
-        { 
-            SaveAndSendButton.Enabled = false;
-            AddPersonButton.Enabled = true;
-            enableSaveImage = false;
-
-            
-         
 
             var client = ImageAnnotatorClient.Create();
             var image = Google.Cloud.Vision.V1.Image.FromFile(pathToFace); //How to save image and send it to Google Cloud API; Create stats??
@@ -217,15 +209,21 @@ namespace FacialRecognition
             //System.Diagnostics.Debug.Write(response.ToString());
 
             dynamic dynJson = JsonConvert.DeserializeObject(response);
-
-            //Displaying JSON in respective fields
-            confidenceOutput.Text = $"Detection Confidence: {(dynJson[0]["detectionConfidence"].ToDouble() * 100).ToString()}%";
-            joyOutput.Text = $"Joy: {dynJson[0]["joyLikelihood"].ToString()}";
-            sorrowOutput.Text = $"Sorrow: {dynJson[0]["sorrowLikelihood"].ToString()}";
-            angerOutput.Text = $"Anger: {dynJson[0]["angerLikelihood"].ToString()}";
-            surpriseOutput.Text = $"Surpise: {dynJson[0]["surpriseLikelihood"].ToString()}";
-
+            confidenceOutput.Text = $"{(dynJson[0]["detectionConfidence"].ToString())}%";
+            joyOutput.Text = $"{dynJson[0]["joyLikelihood"].ToString()}";
+            sorrowOutput.Text = $"{dynJson[0]["sorrowLikelihood"].ToString()}";
+            angerOutput.Text = $"{dynJson[0]["angerLikelihood"].ToString()}";
+            surpriseOutput.Text = $"{dynJson[0]["surpriseLikelihood"].ToString()}";
         }
+
+        private void SaveAndSendButton_Click(object sender, EventArgs e)
+        { 
+            SaveAndSendButton.Enabled = false;
+            AddPersonButton.Enabled = true;
+            enableSaveImage = false;
+         
+        }
+
 
         private void TrainButton_Click(object sender, EventArgs e)
         {
@@ -292,6 +290,7 @@ namespace FacialRecognition
 
             
         }
+
 
     }
     
