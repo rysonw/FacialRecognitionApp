@@ -46,7 +46,15 @@ namespace FacialRecognition
         CascadeClassifier faceCascadeClassifier = new CascadeClassifier("C:\\Users\\wongr\\OneDrive\\Desktop\\CS_Projects\\FaceRecog\\FacialRecognition\\haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle; Static for now will add secret later
         Mat frame = new Mat();
         EigenFaceRecognizer recognizer;
-        
+
+        public Dictionary<string, int> moodPercentages = new Dictionary<string, int>()
+        {
+            { "VERY_UNLIKELY", 0 },
+            { "UNLIKELY", 0 },
+            { "LIKELY", 0 },
+            { "VERY_LIKELY", 0 }
+        };
+
 
         #endregion
 
@@ -203,6 +211,7 @@ namespace FacialRecognition
             AddPersonButton.Enabled = true;
             enableSaveImage = true;
 
+            //Create seperate function??
             var client = ImageAnnotatorClient.Create();
             var image = Google.Cloud.Vision.V1.Image.FromFile(pathToFace); //How to save image and send it to Google Cloud API; Create stats??
             var response = client.DetectFaces(image).ToString(); //JSON response
@@ -210,13 +219,27 @@ namespace FacialRecognition
             //System.Diagnostics.Debug.Write(response.ToString());
             Thread.Sleep(1000);
             dynamic dynJson = JsonConvert.DeserializeObject(response);
-            double confidence = Convert.ToDouble(dynJson[0]["detectionConfidence"]) * 100;
 
-            confidenceOutput.Text = $"{confidence.ToString()}%";
+            //TODO: Create a one-liner for this code
+            double confidence = Convert.ToDouble((dynJson[0]["detectionConfidence"]) * 100);
+            string confidenceString = confidence.ToString();
+            string splicedconfidenceString = confidenceString.Substring(0, 5);
+
+            confidenceOutput.Text = $"{splicedconfidenceString}%";
             joyOutput.Text = $"{dynJson[0]["joyLikelihood"].ToString()}";
             sorrowOutput.Text = $"{dynJson[0]["sorrowLikelihood"].ToString()}";
             angerOutput.Text = $"{dynJson[0]["angerLikelihood"].ToString()}";
             surpriseOutput.Text = $"{dynJson[0]["surpriseLikelihood"].ToString()}";
+
+            //Updating Pie Chart; VERY_LIKELY will get 80% of the chart, LIKELY will get 20 and be split.
+            moodChart.Series["moods"].Points.AddXY("Joy", dynJson[0]["joyLikelihood"].ToString());
+            moodChart.Series["moods"].Points.AddXY("Anger", dynJson[0]["sorrowLikelihood"].ToString());
+            moodChart.Series["moods"].Points.AddXY("Sorrow", dynJson[0]["angerLikelihood"].ToString());
+            moodChart.Series["moods"].Points.AddXY("Suprised", dynJson[0]["surpriseLikelihood"].ToString());
+
+            //if ()
+            //moodChart.Series["moods"].Points.AddXY("Neutral", 10);
+
         }
 
         private void SaveAndSendButton_Click(object sender, EventArgs e)
@@ -291,6 +314,11 @@ namespace FacialRecognition
                 return false;
             }
 
+            
+        }
+
+        private double SetMoodPercentages()
+        {
             
         }
 
