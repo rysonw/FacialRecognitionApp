@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region Imports
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,6 +19,9 @@ using System.Drawing.Text;
 using System.Diagnostics;
 using Google.Cloud.Vision.V1;
 using Newtonsoft.Json;
+using System.Windows.Forms.VisualStyles;
+
+#endregion
 
 namespace FacialRecognition
 {
@@ -43,18 +48,9 @@ namespace FacialRecognition
         public string pathToFace;
         DirectoryInfo dirToSend = new DirectoryInfo(Directory.GetCurrentDirectory() + @"\Send_Images");
 
-        CascadeClassifier faceCascadeClassifier = new CascadeClassifier("C:\\Users\\wongr\\OneDrive\\Desktop\\CS_Projects\\FaceRecog\\FacialRecognition\\haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle; Static for now will add secret later
+        CascadeClassifier faceCascadeClassifier = new CascadeClassifier("C:\\Users\\ryson\\source\\repos\\FacialRecognition\\FacialRecognition\\haarcascade_frontalface_default.xml"); //Declaring Capture Rectangle; Static for now will add secret later
         Mat frame = new Mat();
         EigenFaceRecognizer recognizer;
-
-        public Dictionary<string, int> moodPercentages = new Dictionary<string, int>()
-        {
-            { "VERY_UNLIKELY", 0 },
-            { "UNLIKELY", 0 },
-            { "LIKELY", 0 },
-            { "VERY_LIKELY", 0 }
-        };
-
 
         #endregion
 
@@ -118,7 +114,7 @@ namespace FacialRecognition
                                 Directory.CreateDirectory(pathToSend);
                             }
 
-                            ////Tasks are basically threads; Is this thread needed if we are only taking one picture?; Google Cloud API implementation starts here. Have it save image to directory then send to Google for classification
+                            //Tasks are basically threads; they are used to run multiple processes at the same time
                             Task.Factory.StartNew(() => {
                                 for (int i = 0; i < 10; i++)
                                 {
@@ -148,9 +144,6 @@ namespace FacialRecognition
                             resultImage.Resize(200, 200, Inter.Cubic).Save(pathToSend + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg");
                             pathToFace = pathToSend + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg";
 
-                           
-
-
                             if (AddPersonButton.InvokeRequired) //Invokes make sure you are interacting with the right element in the correct thread
                             {
                                 AddPersonButton.Invoke(new ThreadStart(delegate
@@ -170,14 +163,14 @@ namespace FacialRecognition
                                 var result = recognizer.Predict(grayFaceResult);
                                 Debug.WriteLine(result.Label + ". " + result.Distance);
                                 
-                                //Here results found known faces
+                                //Results found known faces; Too much of a headache to implement now
                                 if (result.Label != -1 && result.Distance < 2000)
                                 {
                                     CvInvoke.PutText(currentFrame, PersonsNames[result.Label], new Point(face.X - 2, face.Y - 2),
                                         FontFace.HersheyComplex, 1.0, new Bgr(Color.Blue).MCvScalar);
                                     CvInvoke.Rectangle(currentFrame, face, new Bgr(Color.Blue).MCvScalar, 3);
                                 }
-                                //here results did not found any know faces
+                                //Results did not found any know faces
                                 else
                                 {
                                     CvInvoke.PutText(currentFrame, "????", new Point(face.X - 2, face.Y - 2),
@@ -204,42 +197,154 @@ namespace FacialRecognition
             faceDetectionEnabled = true;
         }
 
-        //Wrap in try catch block
+        //Wrap function in try catch block 
         private void AddPersonButton_Click(object sender, EventArgs e)
         {
+            moodChart.Series["Moods"].Points.Clear(); //Clear charts
+
             SaveAndSendButton.Enabled = true;
             AddPersonButton.Enabled = true;
             enableSaveImage = true;
 
-            //Create seperate function??
             var client = ImageAnnotatorClient.Create();
-            var image = Google.Cloud.Vision.V1.Image.FromFile(pathToFace); //How to save image and send it to Google Cloud API; Create stats??
+            var image = Google.Cloud.Vision.V1.Image.FromFile(pathToFace); //How to save image and send it to Google Cloud API
             var response = client.DetectFaces(image).ToString(); //JSON response
 
             //System.Diagnostics.Debug.Write(response.ToString());
-            Thread.Sleep(1000);
+            
+            Thread.Sleep(2000);
             dynamic dynJson = JsonConvert.DeserializeObject(response);
 
-            //TODO: Create a one-liner for this code
+            //TODO: Create a one-liner for this code; NEED TRY CATCH BLOCK IF PICTURE IS TAKEN W/O FACE
+
             double confidence = Convert.ToDouble((dynJson[0]["detectionConfidence"]) * 100);
             string confidenceString = confidence.ToString();
-            string splicedconfidenceString = confidenceString.Substring(0, 5);
+            string splicedConfidenceString = confidenceString.Substring(0, 5);
 
-            confidenceOutput.Text = $"{splicedconfidenceString}%";
-            joyOutput.Text = $"{dynJson[0]["joyLikelihood"].ToString()}";
-            sorrowOutput.Text = $"{dynJson[0]["sorrowLikelihood"].ToString()}";
-            angerOutput.Text = $"{dynJson[0]["angerLikelihood"].ToString()}";
-            surpriseOutput.Text = $"{dynJson[0]["surpriseLikelihood"].ToString()}";
+            string confidenceO = $"{splicedConfidenceString}%";
+            string joyO = $"{dynJson[0]["joyLikelihood"].ToString()}";
+            string sorrowO = $"{dynJson[0]["sorrowLikelihood"].ToString()}";
+            string angerO = $"{dynJson[0]["angerLikelihood"].ToString()}";
+            string surpriseO = $"{dynJson[0]["surpriseLikelihood"].ToString()}";
 
-            //Updating Pie Chart; VERY_LIKELY will get 80% of the chart, LIKELY will get 20 and be split.
-            moodChart.Series["moods"].Points.AddXY("Joy", dynJson[0]["joyLikelihood"].ToString());
-            moodChart.Series["moods"].Points.AddXY("Anger", dynJson[0]["sorrowLikelihood"].ToString());
-            moodChart.Series["moods"].Points.AddXY("Sorrow", dynJson[0]["angerLikelihood"].ToString());
-            moodChart.Series["moods"].Points.AddXY("Suprised", dynJson[0]["surpriseLikelihood"].ToString());
+            confidenceOutput.Text = confidenceO;
+            joyOutput.Text = joyO;
+            sorrowOutput.Text = sorrowO;
+            angerOutput.Text = angerO;
+            surpriseOutput.Text = surpriseO;
 
-            //if ()
-            //moodChart.Series["moods"].Points.AddXY("Neutral", 10);
+            string[] moodStrings = new string[] { joyO, sorrowO, angerO, surpriseO };
+            Dictionary<string, int> moodPercentages = new Dictionary<string, int>(); //Dictionary to hold the mood results; Name of Mood: Percentage in Graph
 
+
+            for (int i = 0; i < 4; i++) //Use index to identify what mood; Getting error trying to use a switch
+            {
+                if (i == 0)
+                {
+                    if (moodStrings[i] == "VERY_UNLIKELY" || moodStrings[i] == "UNLIKELY")
+                    {
+                        moodPercentages.Add("Joy", 0);
+                    }
+
+                    else if (moodStrings[i] == "LIKELY")
+                    {
+                        moodPercentages.Add("Joy", 10);
+                    }
+
+                    else //VERY_LIKELY
+                    {
+                        moodPercentages.Add("Joy", 80);
+                    }
+                }
+
+                if (i == 1)
+                {
+                    if (moodStrings[i] == "VERY_UNLIKELY" || moodStrings[i] == "UNLIKELY")
+                    {
+                        moodPercentages.Add("Sorrow", 0);
+                    }
+
+                    else if (moodStrings[i] == "LIKELY")
+                    {
+                        moodPercentages.Add("Sorrow", 10);
+                    }
+
+                    else //VERY_LIKELY
+                    {
+                        moodPercentages.Add("Sorrow", 80);
+                    }
+                }
+
+                if (i == 2)
+                {
+                    if (moodStrings[i] == "VERY_UNLIKELY" || moodStrings[i] == "UNLIKELY")
+                    {
+                        moodPercentages.Add("Anger", 0);
+                    }
+
+                    else if (moodStrings[i] == "LIKELY")
+                    {
+                        moodPercentages.Add("Anger", 10);
+                    }
+
+                    else //VERY_LIKELY
+                    {
+                        moodPercentages.Add("Anger", 80);
+                    }
+                }
+
+                if (i == 3)
+                {
+                    if (moodStrings[i] == "VERY_UNLIKELY" || moodStrings[i] == "UNLIKELY")
+                    {
+                        moodPercentages.Add("Surprised", 0);
+                    }
+
+                    else if (moodStrings[i] == "LIKELY")
+                    {
+                        moodPercentages.Add("Surprised", 10);
+                    }
+
+                    else //VERY_LIKELY
+                    {
+                        moodPercentages.Add("Surprised", 80);
+                    }
+                }
+            }
+
+            int counter = 0;
+
+            foreach (string mood in moodPercentages.Keys)
+            {
+                if (moodPercentages[mood] == 0)
+                {
+                    counter++;
+                }
+
+                //moodChart.Series["Moods"].Points.AddXY(mood, moodPercentages[mood]);
+            }
+
+            if (counter == 4)
+            {
+                moodChart.Series["Moods"].Points.AddXY("Neutral", 100);
+            }
+
+            else
+            {
+                foreach (string mood in moodPercentages.Keys)
+                {
+                    if (moodPercentages[mood] == 0)
+                    {
+                        continue;
+                    }
+                    else { 
+                    moodChart.Series["Moods"].Points.AddXY(mood, moodPercentages[mood]);
+                    }
+                }
+            }
+
+            GC.Collect();
+                
         }
 
         private void SaveAndSendButton_Click(object sender, EventArgs e)
@@ -291,7 +396,6 @@ namespace FacialRecognition
 
                 if (TrainedFaces.Count() > 0)
                 {
-                    // recognizer = new EigenFaceRecognizer(ImagesCount,Threshold);
                     recognizer = new EigenFaceRecognizer(imageCount, threshold);
                     recognizer.Train(TrainedFaces.ToArray(), PersonsLabes.ToArray());
                     isTrained = true;
@@ -316,12 +420,6 @@ namespace FacialRecognition
 
             
         }
-
-        private double SetMoodPercentages()
-        {
-            
-        }
-
 
     }
     
