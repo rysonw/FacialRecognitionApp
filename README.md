@@ -10,7 +10,7 @@
 
 ### Overview and Purpose:
 
-This app is a basic facial detection app. Using the Emgu.CV module, we are able to use AI and build our own model to recognize faces present in the picture. We can also take images an generate real-time mood detection and display the statistics through the power of the Google Cloud Vision API.
+This app is a basic facial detection app. Using the Emgu.CV module, we are able to use AI and build our own model to recognize faces present in the picture. We can also take images an generate real-time mood detection and display the statistics through the Google Cloud Vision API.
 <br>
 
 ### Turning on the Camera and Detecting Faces:
