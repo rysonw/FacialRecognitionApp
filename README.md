@@ -23,7 +23,20 @@ TODO
 TODO
 <br>
 
-### Recognizing Known/Unknown Faces:
+### Mood Detection:
 
-TODO
+After the image is saved to the directory, the image is then sent to the Google Vision API for classification. We display the information from the JSON response in text boxes and through a circle graph. Before each image is saved, the folder used to store the images to be sent is cleared. Below are some examples of what is being detected:
 
+#Joy:
+![Joy](https://user-images.githubusercontent.com/91065673/200970747-99545b40-2149-4439-b518-5fdb9fc6953d.png)
+
+#Anger:
+
+
+#Surprised:
+
+
+#Sorrow:
+
+
+#Neutral:
