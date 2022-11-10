@@ -15,8 +15,13 @@ This app is a basic facial detection app. Using the Emgu.CV module, we are able 
 
 ### Detecting Faces:
 
-TODO
+Startup:
+![Startup](https://user-images.githubusercontent.com/91065673/200977683-2d3ea92f-94a4-4dd6-956a-d8ce816137ec.png)
 <br>
+
+Clicking on "Detect Faces", we enable the smaller facial detection screen on the right.
+
+![DetectFaces Sample](https://user-images.githubusercontent.com/91065673/200977629-504b4282-1cb1-4026-beec-a2d33733822e.gif)
 
 ### Saving Images:
 
@@ -28,7 +33,6 @@ if (!Directory.Exists(pathTrain)) //We create this directory if it does not exis
   Directory.CreateDirectory(pathTrain);
 }
 ```
-<br>
 
 ### Mood Detection:
 
@@ -39,12 +43,13 @@ Joy:
 ![Joy](https://user-images.githubusercontent.com/91065673/200970747-99545b40-2149-4439-b518-5fdb9fc6953d.png)
 
 Anger:
-
+TODO
 
 Surprised:
-
+TODO
 
 Sorrow:
-
+TODO
 
 Neutral:
+TODO
