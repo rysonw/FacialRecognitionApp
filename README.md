@@ -20,15 +20,12 @@ TODO
 
 ### Saving Images:
 
+We save images in folders locally within the project. If the folders are not found, we create the folder and store the images to be saved inside of it.
+
 ```
-if (!Directory.Exists(pathTrain)) //We create this directory if it does not exist 
+if (!Directory.Exists(pathTrain)) //We create this directory if it does not exist
 {
   Directory.CreateDirectory(pathTrain);
-}
-
-if (!Directory.Exists(pathToSend)) //We create this directory if it does not exist 
-{
-  Directory.CreateDirectory(pathToSend);
 }
 ```
 <br>
