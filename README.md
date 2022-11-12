@@ -45,11 +45,5 @@ Joy:
 Anger:
 TODO
 
-Surprised:
-TODO
-
 Sorrow:
-TODO
-
-Neutral:
 TODO
