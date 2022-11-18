@@ -41,9 +41,13 @@ After the image is saved to the directory, the image is then sent to the Google 
 Joy:
 <br>
 ![Joy](https://user-images.githubusercontent.com/91065673/200970747-99545b40-2149-4439-b518-5fdb9fc6953d.png)
-
+<br>
 Anger:
-TODO
+<br>
+![Anger](https://user-images.githubusercontent.com/91065673/202618993-f49cdd6a-156d-4450-89c9-28b4df8af474.png)
+<br>
 
-Sorrow:
-TODO
+Neutral:
+<br>
+![Neutral](https://user-images.githubusercontent.com/91065673/202619011-7090a5d8-a375-491f-b5ba-f2eec2d1bd57.png)
+<br>
