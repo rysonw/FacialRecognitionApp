@@ -23,6 +23,8 @@ using System.Windows.Forms.VisualStyles;
 
 #endregion
 
+//gcloud auth application-default login
+
 namespace FacialRecognition
 {
     public partial class Form1 : Form
@@ -63,19 +65,12 @@ namespace FacialRecognition
             vidCapture.Start();
         }
 
-        //private void CaptureButton_Click(object sender, EventArgs e)
-        //{
-        //    vidCapture = new Capture();
-        //    vidCapture.ImageGrabbed += ProcessFrame;
-        //    vidCapture.Start();
-                
-        //}
 
         private void ProcessFrame(object sender, EventArgs e) //Handles ProcessFrame which will be rendered into picture box
         {
             //Step 1: Capture the Video and render it into main picture box
             vidCapture.Retrieve(frame, 0);
-            currentFrame = frame.ToImage<Bgr, Byte>().Resize(picCapture.Width, picCapture.Height, Inter.Cubic);
+            currentFrame = frame.ToImage<Bgr, Byte>().Resize(picCapture.Width, picCapture.Height, Inter.Cubic); //Main Picture Box
 
             //Step 2: Facial Recognition while capturing video
             if (faceDetectionEnabled)
@@ -144,7 +139,7 @@ namespace FacialRecognition
                             resultImage.Resize(200, 200, Inter.Cubic).Save(pathToSend + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg");
                             pathToFace = pathToSend + @"\" + textPersonName.Text + "_" + DateTime.Now.ToString("dd-mm-yyyy-hh-mm-ss") + ".jpg";
 
-                            if (AddPersonButton.InvokeRequired) //Invokes make sure you are interacting with the right element in the correct thread
+                            if (AddPersonButton.InvokeRequired) //Make sure you are interacting with the right element in the correct thread
                             {
                                 AddPersonButton.Invoke(new ThreadStart(delegate
                                 {
@@ -163,7 +158,7 @@ namespace FacialRecognition
                                 var result = recognizer.Predict(grayFaceResult);
                                 Debug.WriteLine(result.Label + ". " + result.Distance);
                                 
-                                //Results found known faces; Too much of a headache to implement now
+                                //Results found known faces;
                                 if (result.Label != -1 && result.Distance < 2000)
                                 {
                                     CvInvoke.PutText(currentFrame, PersonsNames[result.Label], new Point(face.X - 2, face.Y - 2),
@@ -202,18 +197,17 @@ namespace FacialRecognition
         {
             moodChart.Series["Moods"].Points.Clear(); //Clear charts
 
-            SaveAndSendButton.Enabled = true;
+            SaveToTrain.Enabled = true;
             AddPersonButton.Enabled = true;
             enableSaveImage = true;
 
             var client = ImageAnnotatorClient.Create();
-            var image = Google.Cloud.Vision.V1.Image.FromFile(pathToFace); //How to save image and send it to Google Cloud API
+            var image = Google.Cloud.Vision.V1.Image.FromFile(pathToFace); //Save image and send it to Google Cloud Vision API
             var response = client.DetectFaces(image).ToString(); //JSON response
-
-            //System.Diagnostics.Debug.Write(response.ToString());
             
             Thread.Sleep(2000);
             dynamic dynJson = JsonConvert.DeserializeObject(response);
+            Thread.Sleep(2000);
 
             //TODO: Create a one-liner for this code; NEED TRY CATCH BLOCK IF PICTURE IS TAKEN W/O FACE
 
@@ -342,17 +336,16 @@ namespace FacialRecognition
                     }
                 }
             }
-
-            GC.Collect();
                 
         }
-
-        private void SaveAndSendButton_Click(object sender, EventArgs e)
+        
+        private void SaveToTrain_Click(object sender, EventArgs e)
         { 
-            SaveAndSendButton.Enabled = false;
+            SaveToTrain.Enabled = true;
             AddPersonButton.Enabled = true;
-            enableSaveImage = false;
-         
+            enableSaveImage = true;
+
+
         }
 
 
@@ -399,8 +392,6 @@ namespace FacialRecognition
                     recognizer = new EigenFaceRecognizer(imageCount, threshold);
                     recognizer.Train(TrainedFaces.ToArray(), PersonsLabes.ToArray());
                     isTrained = true;
-                    Debug.WriteLine(imageCount);
-                    //Debug.WriteLine(isTrained);
                     return true;
                 }
                 else

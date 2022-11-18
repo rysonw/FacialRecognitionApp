@@ -38,7 +38,7 @@
             this.TrainButton = new System.Windows.Forms.Button();
             this.recognizeButton = new System.Windows.Forms.Button();
             this.SamplePictureBox = new System.Windows.Forms.PictureBox();
-            this.SaveAndSendButton = new System.Windows.Forms.Button();
+            this.SaveToTrain = new System.Windows.Forms.Button();
             this.confidenceLabel = new System.Windows.Forms.Label();
             this.supriseLabel = new System.Windows.Forms.Label();
             this.angerLabel = new System.Windows.Forms.Label();
@@ -117,15 +117,15 @@
             this.SamplePictureBox.TabIndex = 7;
             this.SamplePictureBox.TabStop = false;
             // 
-            // SaveAndSendButton
+            // SaveToTrain
             // 
-            this.SaveAndSendButton.Location = new System.Drawing.Point(659, 224);
-            this.SaveAndSendButton.Name = "SaveAndSendButton";
-            this.SaveAndSendButton.Size = new System.Drawing.Size(127, 25);
-            this.SaveAndSendButton.TabIndex = 8;
-            this.SaveAndSendButton.Text = "Save to Train Folder";
-            this.SaveAndSendButton.UseVisualStyleBackColor = true;
-            this.SaveAndSendButton.Click += new System.EventHandler(this.SaveAndSendButton_Click);
+            this.SaveToTrain.Location = new System.Drawing.Point(659, 224);
+            this.SaveToTrain.Name = "SaveToTrain";
+            this.SaveToTrain.Size = new System.Drawing.Size(127, 25);
+            this.SaveToTrain.TabIndex = 8;
+            this.SaveToTrain.Text = "Save to Train Folder";
+            this.SaveToTrain.UseVisualStyleBackColor = true;
+            this.SaveToTrain.Click += new System.EventHandler(this.SaveToTrain_Click);
             // 
             // confidenceLabel
             // 
@@ -246,7 +246,7 @@
             this.Controls.Add(this.supriseLabel);
             this.Controls.Add(this.confidenceLabel);
             this.Controls.Add(this.moodChart);
-            this.Controls.Add(this.SaveAndSendButton);
+            this.Controls.Add(this.SaveToTrain);
             this.Controls.Add(this.SamplePictureBox);
             this.Controls.Add(this.recognizeButton);
             this.Controls.Add(this.TrainButton);
@@ -275,7 +275,7 @@
         private System.Windows.Forms.Button TrainButton;
         private System.Windows.Forms.Button recognizeButton;
         private System.Windows.Forms.PictureBox SamplePictureBox;
-        private System.Windows.Forms.Button SaveAndSendButton;
+        private System.Windows.Forms.Button SaveToTrain;
         private System.Windows.Forms.Label confidenceLabel;
         private System.Windows.Forms.Label supriseLabel;
         private System.Windows.Forms.Label angerLabel;
