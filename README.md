@@ -42,10 +42,10 @@ Joy:
 <br>
 ![Joy](https://user-images.githubusercontent.com/91065673/200970747-99545b40-2149-4439-b518-5fdb9fc6953d.png)
 <br>
+
 Anger:
 <br>
 ![Anger (2)](https://user-images.githubusercontent.com/91065673/202619167-28007174-b3c3-4e34-9723-2dac5d043949.png)
-
 <br>
 
 Neutral:
