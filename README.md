@@ -44,10 +44,11 @@ Joy:
 <br>
 Anger:
 <br>
-![Anger](https://user-images.githubusercontent.com/91065673/202618993-f49cdd6a-156d-4450-89c9-28b4df8af474.png)
+![Anger (2)](https://user-images.githubusercontent.com/91065673/202619167-28007174-b3c3-4e34-9723-2dac5d043949.png)
+
 <br>
 
 Neutral:
 <br>
-![Neutral](https://user-images.githubusercontent.com/91065673/202619011-7090a5d8-a375-491f-b5ba-f2eec2d1bd57.png)
+![Neutral (2)](https://user-images.githubusercontent.com/91065673/202619165-71466cc6-0fe8-45b6-9a79-1e7dab8d94fe.png)
 <br>
