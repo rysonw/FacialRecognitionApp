@@ -8,6 +8,8 @@
 4. Install Emgu.CV
 5. Run the application
 
+MSSA Project 1
+
 ### Overview and Purpose:
 
 This app is a basic facial detection app. Using the Emgu.CV module, we are able to use AI and build our own model to recognize faces present in the picture. We can also take images and generate real-time mood detection through the Google Cloud Vision API.
